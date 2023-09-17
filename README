@@ -1,0 +1,51 @@
+# Build:
+
+git submodule update --init --recursive
+
+cd libwebsockets
+
+mkdir build
+
+cd build
+
+cmake ..
+
+make clean
+
+make
+
+make install
+
+check LD_LIBRARY_PATH if it has /usr/local/lib
+
+gcc -o wss wss.c -lwebsockets -lpthread -lutil
+
+
+# Test:
+
+open example.html with browser
+
+run ./wss from cmd line
+
+click connect button
+
+click somewhere else
+
+try ls cmd: 1. press "L" key, 2. press "S" key, 3. press "Enter" key;
+
+result will show up in the response box
+
+
+
+# TODO: 
+
+get wss working
+
+https://blog.fearcat.in/a?ID=00950-7dc93f6f-e9e3-4081-8e52-f3e4484fffc6
+
+https://mariadb.com/docs/security/data-in-transit-encryption/create-self-signed-certificates-keys-openssl/
+
+
+# Compiling on the RPI3:
+
+sudo apt-get install libssl-dev git cmake openssl

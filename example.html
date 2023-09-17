@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Web Socket Client Example</title>
+    <script type="text/javascript">
+        window.onload = function () {
+            var conn;
+            var log = document.getElementById("log");
+            var msg = document.getElementById("msg");
+
+            function appendLog(item) {
+                var doScroll = log.scrollTop === log.scrollHeight - log.clientHeight;
+                log.appendChild(item);
+                if (doScroll) {
+                    log.scrollTop = log.scrollHeight - log.clientHeight;
+                }
+            }
+
+            document.getElementById("connect").onclick = function () {
+                var server = document.getElementById("wsURL");
+                conn = new WebSocket(server.value);
+                if (window["WebSocket"]) {
+                    if (conn) {
+                        conn.onopen = function (evt) {
+                            document.getElementById("disconnect").disabled = false
+                            document.getElementById("connect").disabled = true
+                            document.getElementById("status").innerHTML = "Connection opened"
+                        }
+                        conn.onclose = function (evt) {
+                            document.getElementById("status").innerHTML = "Connection closed"
+                            document.getElementById("connect").disabled = false
+                        };
+                        conn.onmessage = function (evt) {
+                            var messages = evt.data.split('\n');
+                            for (var i = 0; i < messages.length; i++) {
+                                var item = document.createElement("pre");
+                                item.innerText = messages[i];
+                                appendLog(item);
+                            }
+                        }
+                    }
+                } 
+                else {
+                    alert("<b>Your browser does not support WebSockets.</b>");
+                }
+            };
+
+            document.getElementById("disconnect").onclick = function () {
+                conn.close()
+                document.getElementById("connect").disabled = false
+                document.getElementById("disconnect").disabled = true
+                document.getElementById("status").innerHTML = "Connection closed"
+            };
+	        document.addEventListener('keydown', function(event) {
+		        if (!conn) {
+			        //alert("not connected");
+                    return false;
+                }
+                
+                if (event.key == "Enter") {
+                    conn.send("\n");
+                } else if (event.key == "Backspace") {
+                    conn.send("\b");
+                } else if (event.key == "Tab") {
+                    conn.send("\t");
+                } else {
+                    conn.send(event.key);
+                }
+                
+	        });
+        };
+
+    </script>
+    <style type="text/css">
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: gray;
+        }
+
+        #log {
+            background: white;
+            margin: 0;
+            padding: 0.5em 0.5em 0.5em 0.5em;
+            top: 1.5em;
+            left: 0.5em;
+            right: 0.5em;
+            bottom: 3em;
+            overflow: auto;
+            position: absolute;
+            height: 530px;
+        }
+
+        #form {
+            padding: 0 0.5em 0 0.5em;
+            margin: 0;
+            position: absolute;
+            bottom: 3em;
+            top: 5em;
+            left: 8px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #serverLocation {
+            padding-top: 0.3em;
+        }
+
+        #requestSection {
+            height: 38px;
+        }
+
+        #responseMsgSection {
+            height: 570px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+<fieldset id="serverLocation">
+    <legend>Server Location</legend>
+    <div>
+        <input type="button" id="connect" value="Connect"/>
+        <input type="button" id="disconnect" value="Disconnect" disabled/>
+        <input type="text" id="wsURL" value="ws://localhost:8000" size="64">
+        <span id="status"></span>
+    </div>
+</fieldset>
+<fieldset id="responseMsgSection">
+    <legend>Response</legend>
+    <div id="log"></div>
+</fieldset>
+</body>
+</html>
